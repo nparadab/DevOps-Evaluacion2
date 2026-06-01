@@ -17,7 +17,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}   # 👈 este faltaba
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: us-east-1
 
       - name: Login to Amazon ECR
@@ -26,16 +26,19 @@ jobs:
 
       - name: Build and push frontend
         run: |
-          docker build -t ${{ steps.login-ecr.outputs.registry }}/frontend:latest ./front_despacho
+          docker build -t ${{ steps.login-ecr.outputs.registry }}/frontend:latest \
+            -f ./front_despacho/Dockerfile ./front_despacho
           docker push ${{ steps.login-ecr.outputs.registry }}/frontend:latest
 
       - name: Build and push back-despachos
         run: |
-          docker build -t ${{ steps.login-ecr.outputs.registry }}/back-despachos:latest ./back-Despachos_SpringBoot
+          docker build -t ${{ steps.login-ecr.outputs.registry }}/back-despachos:latest \
+            -f ./back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO/Dockerfile ./back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
           docker push ${{ steps.login-ecr.outputs.registry }}/back-despachos:latest
 
       - name: Build and push back-ventas
         run: |
-          docker build -t ${{ steps.login-ecr.outputs.registry }}/back-ventas:latest ./back-Ventas_SpringBoot
+          docker build -t ${{ steps.login-ecr.outputs.registry }}/back-ventas:latest \
+            -f ./back-Ventas_SpringBoot/Springboot-API-REST/Dockerfile ./back-Ventas_SpringBoot/Springboot-API-REST
           docker push ${{ steps.login-ecr.outputs.registry }}/back-ventas:latest
 
