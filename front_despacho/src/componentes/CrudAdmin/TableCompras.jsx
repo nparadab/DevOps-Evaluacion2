@@ -7,7 +7,7 @@ export const TableCompras = () => {
   const [ventas, setVentas] = useState([]);
 
   const compras = async () => {
-    await axios.get("http://32.194.222.193:8082/api/v1/ventas", {
+    await axios.get("/api/v1/ventas", {
       headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
@@ -39,9 +39,9 @@ export const TableCompras = () => {
               <thead>
                 <tr className="py-10">
                   <th className="pr-10">Orden de compra</th>
-                  <th className="pr-10">direccion</th>
-                  <th className="pr-10">fecha de compra</th>
-                  <th className="pr-10">valor total</th>
+                  <th className="pr-10">Dirección</th>
+                  <th className="pr-10">Fecha de compra</th>
+                  <th className="pr-10">Valor total</th>
                   <th className="pr-10"></th>
                 </tr>
               </thead>
@@ -95,3 +95,4 @@ export const TableCompras = () => {
     </>
   );
 };
+
