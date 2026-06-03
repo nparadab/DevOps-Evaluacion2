@@ -20,7 +20,7 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: admin123
     ports:
-      - "8081:8080"
+      - "8081:8081"
     depends_on:
       - db
 
@@ -37,12 +37,12 @@ services:
       - db
 
   frontend:
-    build: ./frontend
+    build: ./front_despacho
     container_name: frontend
     ports:
       - "80:80"
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./front_despacho/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - back-despachos
       - back-ventas
