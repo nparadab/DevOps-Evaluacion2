@@ -54,40 +54,39 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             set -e
-            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 416345627870.dkr.ecr.us-east-1.amazonaws.com
-            rm -rf /tmp/nginx-conf
-            mkdir -p /tmp/nginx-conf
-            cat > /tmp/nginx-conf/default.conf <<'EOF'
-              server {
-                listen 80;
-                server_name _;
-                root /usr/share/nginx/html;
-                index index.html;
+            aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin 416345627870.dkr.ecr.us-east-1.amazonaws.com
+            sudo rm -rf /tmp/nginx-conf || true
+            sudo mkdir -p /tmp/nginx-conf
+            sudo tee /tmp/nginx-conf/default.conf > /dev/null <<'EOF'
+            server {
+              listen 80;
+              server_name _;
+              root /usr/share/nginx/html;
+              index index.html;
 
-                location ~ ^/api/v1/ventas(/.*)?$ {
-                  rewrite ^(/api/v1/ventas)/$ $1 break;
-                  proxy_pass http://10.0.2.109:8080;
-                  proxy_set_header Host $host;
-                  proxy_set_header X-Real-IP $remote_addr;
-                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                }
-
-                location ~ ^/api/v1/despachos(/.*)?$ {
-                  rewrite ^(/api/v1/despachos)/$ $1 break;
-                  proxy_pass http://10.0.2.109:8081;
-                  proxy_set_header Host $host;
-                  proxy_set_header X-Real-IP $remote_addr;
-                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                }
-
-                location / {
-                  try_files $uri /index.html;
-                }
+              location ~ ^/api/v1/ventas(/.*)?$ {
+                rewrite ^(/api/v1/ventas)/$ $1 break;
+                proxy_pass http://10.0.2.109:8080;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
               }
+
+              location ~ ^/api/v1/despachos(/.*)?$ {
+                rewrite ^(/api/v1/despachos)/$ $1 break;
+                proxy_pass http://10.0.2.109:8081;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              }
+
+              location / {
+                try_files $uri /index.html;
+              }
+            }
             EOF
-            docker pull 416345627870.dkr.ecr.us-east-1.amazonaws.com/frontend:latest
-            docker rm -f front-nginx 2>/dev/null || true
-            docker run -d --restart unless-stopped --name front-nginx -p 80:80 \
+            sudo docker pull 416345627870.dkr.ecr.us-east-1.amazonaws.com/frontend:latest
+            sudo docker rm -f front-nginx 2>/dev/null || true
+            sudo docker run -d --restart unless-stopped --name front-nginx -p 80:80 \
               -v /tmp/nginx-conf:/etc/nginx/conf.d:ro \
               416345627870.dkr.ecr.us-east-1.amazonaws.com/frontend:latest
-
